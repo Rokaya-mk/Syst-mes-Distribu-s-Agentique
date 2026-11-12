@@ -1,42 +1,82 @@
 package org.sid.bankaccountservice.services;
 
 import org.sid.bankaccountservice.dto.BankAccountRequesDTO;
-import org.sid.bankaccountservice.dto.BankAccountResponseDtO;
+import org.sid.bankaccountservice.dto.BankAccountResponseDTO;
 import org.sid.bankaccountservice.entities.BankAccount;
+import org.sid.bankaccountservice.exceptions.BankAccountNotFoundException;
+import org.sid.bankaccountservice.mappers.AccountMapper;
 import org.sid.bankaccountservice.repositories.BankAccountRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class AccountServiceImpl implements AccountService {
 
     private BankAccountRepository bankAccountRepository;
+    private AccountMapper accountMapper;
 
-    public AccountServiceImpl(BankAccountRepository bankAccountRepository) {
+
+
+    public AccountServiceImpl(BankAccountRepository bankAccountRepository, AccountMapper accountMapper) {
         this.bankAccountRepository = bankAccountRepository;
+        this.accountMapper = accountMapper;
     }
 
     @Override
-    public BankAccountResponseDtO addAccount(BankAccountRequesDTO bankAccountDTO) {
-        BankAccount bankAccount = BankAccount.builder()
-                .id(UUID.randomUUID().toString())
-                .createdAt(new Date())
-                .balance(bankAccountDTO.getBalance())
-                .type(bankAccountDTO.getType())
-                .currency(bankAccountDTO.getCurrency())
-                .build();
+    public BankAccountResponseDTO addAccount(BankAccountRequesDTO bankAccountDTO) {
+//        BankAccount bankAccount = BankAccount.builder()
+//                .id(UUID.randomUUID().toString())
+//                .createdAt(new Date())
+//                .balance(bankAccountDTO.getBalance())
+//                .type(bankAccountDTO.getType())
+//                .currency(bankAccountDTO.getCurrency())
+//                .build();
+        BankAccount bankAccount = accountMapper.fromBankAccountRequestDTO(bankAccountDTO);
         BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
-        BankAccountResponseDtO bankAccountResponseDtO = BankAccountResponseDtO.builder()
-                .id(savedBankAccount.getId())
-                .balance(savedBankAccount.getBalance())
-                .createdAt(savedBankAccount.getCreatedAt())
-                .type(savedBankAccount.getType())
-                .currency((savedBankAccount.getCurrency()))
-                .build();
+//        BankAccountResponseDtO bankAccountResponseDtO = BankAccountResponseDtO.builder()
+//                .id(savedBankAccount.getId())
+//                .balance(savedBankAccount.getBalance())
+//                .createdAt(savedBankAccount.getCreatedAt())
+//                .type(savedBankAccount.getType())
+//                .currency((savedBankAccount.getCurrency()))
+//                .build();
+        BankAccountResponseDTO bankAccountResponseDtO =accountMapper.fromBankAccount(savedBankAccount);
         return bankAccountResponseDtO;
     }
+
+    @Override
+    public List<BankAccountResponseDTO> bankAccountList() {
+        List<BankAccount> bankAccounts = bankAccountRepository.findAll();
+        List<BankAccountResponseDTO> bankAccountResponseDTOS = bankAccounts.stream().map(bankAccount -> {
+            return accountMapper.fromBankAccount(bankAccount);
+        }).collect(Collectors.toList());
+
+        return bankAccountResponseDTOS;
+    }
+
+    @Override
+    public BankAccountResponseDTO getBankAccount(String accountId) throws BankAccountNotFoundException {
+        BankAccount bankAccount = bankAccountRepository.findById(accountId)
+                .orElseThrow( () -> new BankAccountNotFoundException("Bank account not found"));
+        return accountMapper.fromBankAccount(bankAccount);
+    }
+
+    @Override
+    public BankAccountResponseDTO updateBankAccount(BankAccountRequesDTO bankAccountRequesDTO) {
+        BankAccount bankAccount = accountMapper.fromBankAccountRequestDTO(bankAccountRequesDTO);
+        BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
+        return accountMapper.fromBankAccount(bankAccount);
+    }
+
+    @Override
+    public void deleteBankaccount(String accountId) {
+        bankAccountRepository.deleteById(accountId);
+    }
+
 }

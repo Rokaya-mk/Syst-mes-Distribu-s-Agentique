@@ -1,15 +1,16 @@
 package org.sid.bankaccountservice.web;
 
 import org.sid.bankaccountservice.dto.BankAccountRequesDTO;
-import org.sid.bankaccountservice.dto.BankAccountResponseDtO;
+import org.sid.bankaccountservice.dto.BankAccountResponseDTO;
 import org.sid.bankaccountservice.entities.BankAccount;
+import org.sid.bankaccountservice.exceptions.BankAccountNotFoundException;
+import org.sid.bankaccountservice.mappers.AccountMapper;
 import org.sid.bankaccountservice.repositories.BankAccountRepository;
 import org.sid.bankaccountservice.services.AccountService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
@@ -17,38 +18,41 @@ public class AccountRestController {
 
     private BankAccountRepository bankAccountRepository;
     private AccountService accountService;
+    private AccountMapper accountMapper;
 
-    public AccountRestController(BankAccountRepository bankAccountRepository,AccountService accountService) {
+    public AccountRestController(BankAccountRepository bankAccountRepository,AccountService accountService, AccountMapper accountMapper) {
         this.bankAccountRepository = bankAccountRepository;
         this.accountService = accountService;
+        this.accountMapper = accountMapper;
     }
 
     @GetMapping("/bankAccounts")
-    public List<BankAccount> bankAccounts(){
-        return bankAccountRepository.findAll();
+    public List<BankAccountResponseDTO> bankAccounts(){
+        return accountService.bankAccountList();
     }
 
     @GetMapping("/bankAccounts/{id}")
-    public BankAccount bankAccounts(@PathVariable String id){
-        return bankAccountRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Account %s not found",id)));
+    public BankAccountResponseDTO bankAccounts(@PathVariable String id) throws BankAccountNotFoundException {
+        return accountService.getBankAccount(id);
     }
     @PostMapping("/bankAccounts")
-    public BankAccountResponseDtO save(@RequestBody BankAccountRequesDTO requestDTO){
+    public BankAccountResponseDTO save(@RequestBody BankAccountRequesDTO requestDTO){
         return accountService.addAccount(requestDTO);
     }
 
     @PutMapping("/bankAccounts/{id}")
-    public BankAccount update(@PathVariable String id,@RequestBody BankAccount bankAccount){
-        BankAccount account = bankAccountRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Account %s not found",id)));
-        if(bankAccount.getBalance() != null) account.setBalance(bankAccount.getBalance());
-        if(bankAccount.getCreatedAt() != null) account.setCreatedAt(new Date());
-        if(bankAccount.getType() != null) account.setType(bankAccount.getType());
-        if(bankAccount.getCurrency() != null) account.setCurrency(bankAccount.getCurrency());
-        return bankAccountRepository.save(account);
+    public BankAccountResponseDTO update(@PathVariable String id,@RequestBody BankAccountRequesDTO bankAccount){
+//        BankAccount account = bankAccountRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Account %s not found",id)));
+//        if(bankAccount.getBalance() != null) account.setBalance(bankAccount.getBalance());
+//        if(bankAccount.getCreatedAt() != null) account.setCreatedAt(new Date());
+//        if(bankAccount.getType() != null) account.setType(bankAccount.getType());
+//        if(bankAccount.getCurrency() != null) account.setCurrency(bankAccount.getCurrency());
+
+        return accountService.updateBankAccount(bankAccount);
     }
 
     @DeleteMapping("/bankAccounts/{id}")
     public void delete(@PathVariable String id){
-         bankAccountRepository.deleteById(id);
+         accountService.deleteBankaccount(id);
     }
 }
