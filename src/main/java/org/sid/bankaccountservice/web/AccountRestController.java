@@ -32,7 +32,7 @@ public class AccountRestController {
     }
 
     @GetMapping("/bankAccounts/{id}")
-    public BankAccountResponseDTO bankAccounts(@PathVariable String id) throws BankAccountNotFoundException {
+    public BankAccountResponseDTO bankAccounts(@PathVariable Long id) throws BankAccountNotFoundException {
         return accountService.getBankAccount(id);
     }
     @PostMapping("/bankAccounts")
@@ -41,7 +41,7 @@ public class AccountRestController {
     }
 
     @PutMapping("/bankAccounts/{id}")
-    public BankAccountResponseDTO update(@PathVariable String id,@RequestBody BankAccountRequesDTO bankAccount){
+    public BankAccountResponseDTO update(@PathVariable Long id,@RequestBody BankAccountRequesDTO bankAccount){
 //        BankAccount account = bankAccountRepository.findById(id).orElseThrow(() -> new RuntimeException(String.format("Account %s not found",id)));
 //        if(bankAccount.getBalance() != null) account.setBalance(bankAccount.getBalance());
 //        if(bankAccount.getCreatedAt() != null) account.setCreatedAt(new Date());
@@ -52,7 +52,7 @@ public class AccountRestController {
     }
 
     @DeleteMapping("/bankAccounts/{id}")
-    public void delete(@PathVariable String id){
+    public void delete(@PathVariable Long id){
          accountService.deleteBankaccount(id);
     }
 }

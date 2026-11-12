@@ -11,7 +11,7 @@ import java.util.Date;
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class BankAccountResponseDTO {
 
-    private String id;
+    private Long id;
     private Date createdAt;
     private Double balance;
     private String currency;

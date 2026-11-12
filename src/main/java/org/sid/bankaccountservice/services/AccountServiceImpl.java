@@ -61,8 +61,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public BankAccountResponseDTO getBankAccount(String accountId) throws BankAccountNotFoundException {
-        BankAccount bankAccount = bankAccountRepository.findById(accountId)
+    public BankAccountResponseDTO getBankAccount(Long accountId) throws BankAccountNotFoundException {
+        BankAccount bankAccount = bankAccountRepository.findById(String.valueOf(accountId))
                 .orElseThrow( () -> new BankAccountNotFoundException("Bank account not found"));
         return accountMapper.fromBankAccount(bankAccount);
     }
@@ -75,8 +75,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void deleteBankaccount(String accountId) {
-        bankAccountRepository.deleteById(accountId);
+    public void deleteBankaccount(Long accountId) {
+        bankAccountRepository.deleteById(String.valueOf(accountId));
     }
 
 }

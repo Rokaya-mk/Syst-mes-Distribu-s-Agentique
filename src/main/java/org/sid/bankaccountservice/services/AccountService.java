@@ -10,8 +10,8 @@ public interface AccountService {
 
     BankAccountResponseDTO addAccount(BankAccountRequesDTO bankAccountDTO);
     List<BankAccountResponseDTO> bankAccountList();
-    BankAccountResponseDTO getBankAccount(String accountId) throws BankAccountNotFoundException;
+    BankAccountResponseDTO getBankAccount(Long accountId) throws BankAccountNotFoundException;
     BankAccountResponseDTO updateBankAccount(BankAccountRequesDTO bankAccountRequesDTO);
-    void deleteBankaccount(String accountId);
+    void deleteBankaccount(Long accountId);
 
 }

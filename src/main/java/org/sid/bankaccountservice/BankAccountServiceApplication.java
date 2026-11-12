@@ -23,7 +23,7 @@ public class BankAccountServiceApplication {
         return args -> {
             for (int i=0 ; i<10 ; i++ ){
                 BankAccount bankAccount=BankAccount.builder()
-                        .id(UUID.randomUUID().toString())
+//                        .id(UUID.randomUUID().toString())
                         .type(Math.random() > 0.5 ? AccountType.CURRENT_ACCOUNT : AccountType.SAVING_ACCOUNT)
                         .balance(1000 + Math.random()*30000)
                         .createdAt(new Date())
